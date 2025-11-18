@@ -20,7 +20,7 @@ const int pinZ_IE = 49;
 const int pinZ_VV = 50;
 
 // Define useful conversions
-const int MICROSTEPPING = 16; // Driver Setting
+const int MICROSTEPPING = 8; // Driver Setting
 const int STEPS_PER_DEG = 200.0f * MICROSTEPPING / 360.0f; // For rotation
 const int STEPS_PER_MM = 200.0f * MICROSTEPPING / 5.0f; // For translation
 
@@ -94,6 +94,14 @@ void setup()
  
 void loop()
 {
+    // Allows motors to run?
+    stepper1.run();
+    stepper2.run();
+    stepper3.run();
+    stepper4.run();
+    stepper5.run();
+    stepper6.run();
+ 
     if (Serial.available()) {
     
     // Reads in degrees and mm  
@@ -111,12 +119,12 @@ void loop()
     long ML = ML_mm * STEPS_PER_MM;
 
     // Moves to new position until finished
-    stepper1.runToNewPosition(FE);
-    stepper2.runToNewPosition(IE);
-    stepper3.runToNewPosition(VV);
-    stepper4.runToNewPosition(AP);
-    stepper5.runToNewPosition(AP);
-    stepper6.runToNewPosition(ML);
+    stepper1.moveToNewPosition(FE);
+    stepper2.moveToNewPosition(IE);
+    stepper3.moveToNewPosition(VV);
+    stepper4.moveToNewPosition(AP);
+    stepper5.moveToNewPosition(AP);
+    stepper6.moveToNewPosition(ML);
     }
 }
 
