@@ -1,7 +1,8 @@
  #include <AccelStepper.h>
  #include <Encoder.h>
 
-bool home_position(); 
+bool home_position();
+// We need to make an interrupt function for the home-defining limit switches
 
 // Steppers/Power Screws move 1.8 deg/step, 0.225 with 8 microstepping
 // Power Screws move 5mm/rotation
@@ -31,6 +32,7 @@ void setup()
 {  
     // Initialize serial communicationat 115200 bits/sec
     Serial.begin(115200);
+    while(!Serial){};
 
     // Initialize max speeds & accelerations
     stepper1.setMaxSpeed(100); //In Steps/sec, this gives us about 16 seconds/rotation
@@ -65,6 +67,7 @@ void setup()
     
     while(home_position == false) {
     if ( x_home == false ) { // Working under the assumption that the limit switch will return a value of either 0 or 1
+    //we could also use the stepper.stepForward() or stepBackward function
     numsteps_x = numsteps_x - 1; // Signed negative for reverse motion - may need to be positive depending on position of limit switches
     stepper4.runToNewPosition(MICROSTEPPING*numsteps_x); 
     stepper5.runToNewPosition(MICROSTEPPING*numsteps_x); 
