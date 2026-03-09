@@ -3,6 +3,9 @@
 
 bool home_position(); 
 
+// Steppers/Power Screws move 1.8 deg/step, 0.225 with 8 microstepping
+// Power Screws move 5mm/rotation
+
 // Define some steppers and the pins the will use (DRIVER, PUL-, DIR-)
 AccelStepper stepper1(AccelStepper::DRIVER, 22, 28); // Flexion-Extension
 AccelStepper stepper2(AccelStepper::DRIVER, 23, 29); // Internal-External
@@ -20,7 +23,7 @@ const int pinZ_IE = 49;
 const int pinZ_VV = 50;
 
 // Define useful conversions
-const int MICROSTEPPING = 8; // Driver Setting
+const int MICROSTEPPING = 8; // Driver Setting, 1600 steps/rev 
 const int STEPS_PER_DEG = 200.0f * MICROSTEPPING / 360.0f; // For rotation
 const int STEPS_PER_MM = 200.0f * MICROSTEPPING / 5.0f; // For translation
 
@@ -30,17 +33,17 @@ void setup()
     Serial.begin(115200);
 
     // Initialize max speeds & accelerations
-    stepper1.setMaxSpeed(200);
+    stepper1.setMaxSpeed(100); //In Steps/sec, this gives us about 16 seconds/rotation
     stepper1.setAcceleration(100.0);
-    stepper2.setMaxSpeed(200);
+    stepper2.setMaxSpeed(100);
     stepper2.setAcceleration(100.0);
-    stepper3.setMaxSpeed(200);
+    stepper3.setMaxSpeed(100);
     stepper3.setAcceleration(100.0);
-    stepper4.setMaxSpeed(200);
+    stepper4.setMaxSpeed(100);
     stepper4.setAcceleration(100.0);
-    stepper5.setMaxSpeed(200);
+    stepper5.setMaxSpeed(100);
     stepper5.setAcceleration(100.0);
-    stepper6.setMaxSpeed(200);
+    stepper6.setMaxSpeed(100);
     stepper6.setAcceleration(100.0);
 
     // Design homing sequence
@@ -63,28 +66,37 @@ void setup()
     while(home_position == false) {
     if ( x_home == false ) { // Working under the assumption that the limit switch will return a value of either 0 or 1
     numsteps_x = numsteps_x - 1; // Signed negative for reverse motion - may need to be positive depending on position of limit switches
+    stepper4.runToNewPosition(MICROSTEPPING*numsteps_x); 
     stepper5.runToNewPosition(MICROSTEPPING*numsteps_x); 
+
     }
-    
+    stepper4.setCurrentPosition(); //Sets position as 0
+    stepper5.setCurrentPosition();
+
     if (y_home == false ) {
     numsteps_y = numsteps_y - 1; 
     stepper6.runToNewPosition(MICROSTEPPING*numsteps_y); 
     }
+    stepper6.setCurrentPosition();
 
     if ( FE_home == false ) {
     numsteps_FE = numsteps_FE - 1; 
     stepper1.runToNewPosition(MICROSTEPPING*numsteps_FE); 
     } 
+    stepper1.setCurrentPosition();
 
     if ( IE_home == false ) {
     numsteps_IE = numsteps_IE - 1;
     stepper2.runToNewPosition(MICROSTEPPING*numsteps_IE); 
     }
+    stepper2.setCurrentPosition();
 
     if ( VV_home == false ) {
     numsteps_VV = numsteps_VV - 1; 
     stepper3.runToNewPosition(MICROSTEPPING*numsteps_VV); 
     }
+    stepper3.setCurrentPosition();
+
     numsteps_x = 0; 
     numsteps_y = 0; 
     numsteps_FE = 0;
@@ -94,7 +106,7 @@ void setup()
  
 void loop()
 {
-    // Allows motors to run?
+    // Allows motors to run
     stepper1.run();
     stepper2.run();
     stepper3.run();
@@ -119,12 +131,12 @@ void loop()
     long ML = ML_mm * STEPS_PER_MM;
 
     // Moves to new position until finished
-    stepper1.moveToNewPosition(FE);
-    stepper2.moveToNewPosition(IE);
-    stepper3.moveToNewPosition(VV);
-    stepper4.moveToNewPosition(AP);
-    stepper5.moveToNewPosition(AP);
-    stepper6.moveToNewPosition(ML);
+    stepper1.moveTo(FE);
+    stepper2.moveTo(IE);
+    stepper3.moveTo(VV);
+    stepper4.moveTo(AP);
+    stepper5.moveTo(AP);
+    stepper6.moveTo(ML);
     }
 }
 
