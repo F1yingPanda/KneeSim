@@ -15,13 +15,16 @@ AccelStepper stepper4(AccelStepper::DRIVER, 25, 31); // Anterior-Posterior 1
 AccelStepper stepper5(AccelStepper::DRIVER, 26, 32); // Anterior-Posterior 2
 AccelStepper stepper6(AccelStepper::DRIVER, 27, 33); // Medial-Lateral
 
-// Define Encoder pins (pinA, pinB)
+// Define Encoder pins (pinA, pinB) and create encoder the encoders will write to
 Encoder encoder_FE(18,51);
 Encoder encoder_IE(19,52);
 Encoder encoder_VV(20,53);
 const int pinZ_FE = 48;
 const int pinZ_IE = 49;
 const int pinZ_VV = 50;
+long FE_position = 0;
+long IE_position = 0;
+long VV_position = 0;
 
 // Define useful conversions
 const int MICROSTEPPING = 8; // Driver Setting, 1600 steps/rev 
@@ -71,7 +74,6 @@ void setup()
     numsteps_x = numsteps_x - 1; // Signed negative for reverse motion - may need to be positive depending on position of limit switches
     stepper4.runToNewPosition(MICROSTEPPING*numsteps_x); 
     stepper5.runToNewPosition(MICROSTEPPING*numsteps_x); 
-
     }
     stepper4.setCurrentPosition(); //Sets position as 0
     stepper5.setCurrentPosition();
@@ -87,18 +89,21 @@ void setup()
     stepper1.runToNewPosition(MICROSTEPPING*numsteps_FE); 
     } 
     stepper1.setCurrentPosition();
-
+    encoder_FE.write(0);
+     
     if ( IE_home == false ) {
     numsteps_IE = numsteps_IE - 1;
     stepper2.runToNewPosition(MICROSTEPPING*numsteps_IE); 
     }
     stepper2.setCurrentPosition();
+    encoder_IE.write(0);
 
     if ( VV_home == false ) {
     numsteps_VV = numsteps_VV - 1; 
     stepper3.runToNewPosition(MICROSTEPPING*numsteps_VV); 
     }
     stepper3.setCurrentPosition();
+    encoder_VV.write(0);
 
     numsteps_x = 0; 
     numsteps_y = 0; 
@@ -119,31 +124,38 @@ void loop()
  
     if (Serial.available()) {
     
-    // Reads in degrees and mm  
-    float FE_deg = Serial.parseFloat();
-    float IE_deg = Serial.parseFloat();
-    float VV_deg = Serial.parseFloat();
-    float AP_mm = Serial.parseFloat();
-    float ML_mm = Serial.parseFloat();
-    
-    // Converts from float to long
-    long FE = FE_deg * STEPS_PER_DEG;
-    long IE = IE_deg * STEPS_PER_DEG;
-    long VV = VV_deg * STEPS_PER_DEG;
-    long AP = AP_mm * STEPS_PER_MM;
-    long ML = ML_mm * STEPS_PER_MM;
+        // Reads in degrees and mm  
+        float FE_deg = Serial.parseFloat();
+        float IE_deg = Serial.parseFloat();
+        float VV_deg = Serial.parseFloat();
+        float AP_mm = Serial.parseFloat();
+        float ML_mm = Serial.parseFloat();
+        
+        // Converts from float to long
+        long FE = FE_deg * STEPS_PER_DEG;
+        long IE = IE_deg * STEPS_PER_DEG;
+        long VV = VV_deg * STEPS_PER_DEG;
+        long AP = AP_mm * STEPS_PER_MM;
+        long ML = ML_mm * STEPS_PER_MM;
 
-    // Moves to new position until finished
-    stepper1.moveTo(FE);
-    stepper2.moveTo(IE);
-    stepper3.moveTo(VV);
-    stepper4.moveTo(AP);
-    stepper5.moveTo(AP);
-    stepper6.moveTo(ML);
+        // Moves to new position until finished
+        stepper1.moveTo(FE);
+        stepper2.moveTo(IE);
+        stepper3.moveTo(VV);
+        stepper4.moveTo(AP);
+        stepper5.moveTo(AP);
+        stepper6.moveTo(ML);
+
+        // Read encoders after move is finished
+        FE_position = encoder_FE.read();
+        IE_position = encoder_IE.read();
+        VV_position = encoder_IE.read();;
+
+        // Create something to then print to serial "FE,IE,VV" after converting them to char array
     }
 }
 
 bool home_position() {
-if (x_home == 0 || y_home == 0 || FE_home == 0 || IE_home == 0 || VV_home == 0 ) return false;
-else return true; 
+    if (x_home == 0 || y_home == 0 || FE_home == 0 || IE_home == 0 || VV_home == 0 ) return false;
+    else return true; 
 }
