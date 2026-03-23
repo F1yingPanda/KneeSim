@@ -31,6 +31,12 @@ const int MICROSTEPPING = 8; // Driver Setting, 1600 steps/rev
 const int STEPS_PER_DEG = 200.0f * MICROSTEPPING / 360.0f; // For rotation
 const int STEPS_PER_MM = 200.0f * MICROSTEPPING / 5.0f; // For translation
 
+// define read in buffer and read out buffer
+char input[64];
+float values[5];
+char buffer[20];
+
+
 void setup()
 {  
     // Initialize serial communicationat 115200 bits/sec
@@ -121,22 +127,28 @@ void loop()
     stepper4.run();
     stepper5.run();
     stepper6.run();
- 
+
     if (Serial.available()) {
-    
-        // Reads in degrees and mm  
-        float FE_deg = Serial.parseFloat();
-        float IE_deg = Serial.parseFloat();
-        float VV_deg = Serial.parseFloat();
-        float AP_mm = Serial.parseFloat();
-        float ML_mm = Serial.parseFloat();
+     // reads serial into input buffer and delimits it with \0
+      int len = Serial.readBytesUntil('\n', input, sizeof(input) - 1);
+      input[len] = '\0';  // null terminate
+
+      // delimits input by commas
+      char *token = strtok(input, ",");
+      int i = 0;
+
+     // puts delimited input into values array
+      while (token != NULL && i < 5) {
+        values[i++] = atof(token);  // <-- handles floats
+        token = strtok(NULL, ",");
+      }
         
-        // Converts from float to long
-        long FE = FE_deg * STEPS_PER_DEG;
-        long IE = IE_deg * STEPS_PER_DEG;
-        long VV = VV_deg * STEPS_PER_DEG;
-        long AP = AP_mm * STEPS_PER_MM;
-        long ML = ML_mm * STEPS_PER_MM;
+        // Converts from deg/mm float to long steps
+        long FE = values[0] * STEPS_PER_DEG;
+        long IE = values[1] * STEPS_PER_DEG;
+        long VV = values[2] * STEPS_PER_DEG;
+        long AP = values[3] * STEPS_PER_MM;
+        long ML = values[4] * STEPS_PER_MM;
 
         // Moves to new position until finished
         stepper1.moveTo(FE);
@@ -151,7 +163,15 @@ void loop()
         IE_position = encoder_IE.read();
         VV_position = encoder_IE.read();;
 
-        // Create something to then print to serial "FE,IE,VV" after converting them to char array
+        // Converts steps to degrees 
+        long a = FE_position/STEPS_PER_DEG;
+        long b = IE_position/STEPS_PER_DEG;
+        long c = VV_position/STEPS_PER_DEG;
+
+        // Converts degrees into a char array, terminated with newline
+        snprintf(buffer, sizeof(buffer), "%+04ld,%+04ld,%+04ld", a, b, c);
+        Serial.write(buffer, 14);
+        Serial.write('\n');  // total size = 15 bytes
     }
 }
 
