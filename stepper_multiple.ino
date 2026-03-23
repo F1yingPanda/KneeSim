@@ -28,8 +28,8 @@ long VV_position = 0;
 
 // Define useful conversions
 const int MICROSTEPPING = 8; // Driver Setting, 1600 steps/rev 
-const int STEPS_PER_DEG = 200.0f * MICROSTEPPING / 360.0f; // For rotation
-const int STEPS_PER_MM = 200.0f * MICROSTEPPING / 5.0f; // For translation
+const float STEPS_PER_DEG = 200.0f * MICROSTEPPING / 360.0f; // For rotation
+const float STEPS_PER_MM = 200.0f * MICROSTEPPING / 5.0f; // For translation
 
 // define read in buffer and read out buffer
 char input[64];
@@ -144,11 +144,11 @@ void loop()
       }
         
         // Converts from deg/mm float to long steps
-        long FE = values[0] * STEPS_PER_DEG;
-        long IE = values[1] * STEPS_PER_DEG;
-        long VV = values[2] * STEPS_PER_DEG;
-        long AP = values[3] * STEPS_PER_MM;
-        long ML = values[4] * STEPS_PER_MM;
+        long FE = lround(values[0] * STEPS_PER_DEG);
+        long IE = lround(values[1] * STEPS_PER_DEG);
+        long VV = lround(values[2] * STEPS_PER_DEG);
+        long AP = lround(values[3] * STEPS_PER_MM);
+        long ML = lround(values[4] * STEPS_PER_MM);
 
         // Moves to new position until finished
         stepper1.moveTo(FE);
@@ -157,16 +157,32 @@ void loop()
         stepper4.moveTo(AP);
         stepper5.moveTo(AP);
         stepper6.moveTo(ML);
+        
+        // Wait until motion is done
+        while (stepper1.distanceToGo() != 0 ||
+               stepper2.distanceToGo() != 0 ||
+               stepper3.distanceToGo() != 0 ||
+               stepper4.distanceToGo() != 0 ||
+               stepper5.distanceToGo() != 0 ||
+               stepper6.distanceToGo() != 0) {
+
+            stepper1.run();
+            stepper2.run();
+            stepper3.run();
+            stepper4.run();
+            stepper5.run();
+            stepper6.run();
+        }
 
         // Read encoders after move is finished
         FE_position = encoder_FE.read();
         IE_position = encoder_IE.read();
-        VV_position = encoder_IE.read();;
+        VV_position = encoder_VV.read();
 
         // Converts steps to degrees 
-        long a = FE_position/STEPS_PER_DEG;
-        long b = IE_position/STEPS_PER_DEG;
-        long c = VV_position/STEPS_PER_DEG;
+        long a = lround(FE_position/STEPS_PER_DEG);
+        long b = lround(IE_position/STEPS_PER_DEG);
+        long c = lround(VV_position/STEPS_PER_DEG);
 
         // Converts degrees into a char array, terminated with newline
         snprintf(buffer, sizeof(buffer), "%+04ld,%+04ld,%+04ld", a, b, c);
