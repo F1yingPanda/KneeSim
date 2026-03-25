@@ -16,9 +16,16 @@ AccelStepper stepper5(AccelStepper::DRIVER, 26, 32); // Anterior-Posterior 2
 AccelStepper stepper6(AccelStepper::DRIVER, 27, 33); // Medial-Lateral
 
 // Define Encoder pins (pinA, pinB) and create encoder the encoders will write to
-Encoder encoder_FE(18,51);
-Encoder encoder_IE(19,52);
-Encoder encoder_VV(20,53);
+pinMode(2, INPUT_PULLUP);
+pinMode(3, INPUT_PULLUP);
+pinMode(18, INPUT_PULLUP);
+pinMode(19, INPUT_PULLUP);
+pinMode(20, INPUT_PULLUP);
+pinMode(21, INPUT_PULLUP);
+
+Encoder encoder_FE(18,19);
+Encoder encoder_IE(20,21);
+Encoder encoder_VV(2,3);
 const int pinZ_FE = 48;
 const int pinZ_IE = 49;
 const int pinZ_VV = 50;
@@ -81,34 +88,34 @@ void setup()
     stepper4.runToNewPosition(MICROSTEPPING*numsteps_x); 
     stepper5.runToNewPosition(MICROSTEPPING*numsteps_x); 
     }
-    stepper4.setCurrentPosition(); //Sets position as 0
-    stepper5.setCurrentPosition();
+    stepper4.setCurrentPosition(0); //Sets position as 0
+    stepper5.setCurrentPosition(0);
 
     if (y_home == false ) {
     numsteps_y = numsteps_y - 1; 
     stepper6.runToNewPosition(MICROSTEPPING*numsteps_y); 
     }
-    stepper6.setCurrentPosition();
+    stepper6.setCurrentPosition(0);
 
     if ( FE_home == false ) {
     numsteps_FE = numsteps_FE - 1; 
     stepper1.runToNewPosition(MICROSTEPPING*numsteps_FE); 
     } 
-    stepper1.setCurrentPosition();
+    stepper1.setCurrentPosition(0);
     encoder_FE.write(0);
      
     if ( IE_home == false ) {
     numsteps_IE = numsteps_IE - 1;
     stepper2.runToNewPosition(MICROSTEPPING*numsteps_IE); 
     }
-    stepper2.setCurrentPosition();
+    stepper2.setCurrentPosition(0);
     encoder_IE.write(0);
 
     if ( VV_home == false ) {
     numsteps_VV = numsteps_VV - 1; 
     stepper3.runToNewPosition(MICROSTEPPING*numsteps_VV); 
     }
-    stepper3.setCurrentPosition();
+    stepper3.setCurrentPosition(0);
     encoder_VV.write(0);
 
     numsteps_x = 0; 
