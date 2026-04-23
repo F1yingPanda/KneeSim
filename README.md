@@ -4,5 +4,6 @@ Dependencies: This code requires 3 external libraries: AccelStepper by Mike McCa
 
 ## Documentation
 - [Pin List](pinout.md)
+- [Wiring Diagram](WireDiagram.png)
 
 23 April 2026 - Ver 1.0
