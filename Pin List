@@ -1,0 +1,32 @@
+## Pin List
+
+| Signal Name | MCU Pin | Device              | Device Pin | Direction | Notes                 |
+| ----------- | ------- | ------------------- | ---------- | --------- | --------------------- |
+| PUL_FE      | D30     | Stepper Driver (FE) | STEP       | Output    | Pulse signal          |
+| DIR_FE      | D31     | Stepper Driver (FE) | DIR        | Output    | Direction             |
+| PUK_IE      | D28     | Stepper Driver (IE) | STEP       | Output    |                       |
+| DIR_IE      | D29     | Stepper Driver (IE) | DIR        | Output    |                       |
+| PUK_VV      | D32     | Stepper Driver (VV) | STEP       | Output    |                       |
+| DIR_VV      | D33     | Stepper Driver (VV) | DIR        | Output    |                       |
+| PUL_AP1     | D22     | Stepper Driver (AP1)| STEP       | Output    |                       |
+| DIR_AP1     | D23     | Stepper Driver (AP1)| DIR        | Output    |                       |
+| PUK_AP2     | D24     | Stepper Driver (AP2)| STEP       | Output    |                       |
+| DIR_AP2     | D25     | Stepper Driver (AP2)| DIR        | Output    |                       |
+| PUK_ML      | D26     | Stepper Driver (ML) | STEP       | Output    |                       |
+| DIR_ML      | D27     | Stepper Driver (ML) | DIR        | Output    |                       |
+| ENC_FE_A    | D50     | Encoder             | A          | Input     |                       |
+| ENC_FE_B    | D51     | Encoder             | B          | Input     |                       |
+| ENC_FE_Z    | D3      | Encoder             | Index      | Input     | Rising edge interrupt |
+| ENC_IE_A    | D48     | Encoder             | A          | Input     |                       |
+| ENC_IE_B    | D49     | Encoder             | B          | Input     |                       |
+| ENC_IE_Z    | D2      | Encoder             | Index      | Input     | Rising edge interrupt |
+| ENC_VV_A    | D52     | Encoder             | A          | Input     |                       |
+| ENC_VV_B    | D53     | Encoder             | B          | Input     |                       |
+| ENC_VV_Z    | D19     | Encoder             | Index      | Input     | Rising edge interrupt |
+| XSHUT_AP    | D4      | I2C Sensor (AP)     | XSHUT      | Output    |                       |
+| XSHUT_ML    | D5      | I2C Sensor (ML)     | XSHUT      | Output    |                       |
+| SDA         | 20      | I2C Sensors         | SDA        | Bi-dir    |                       |
+| SCL         | 21      | I2C Sensors         | SCL        | Output    |                       |
+| 5V          | 5V      | All Devices         | VCC        | Power     |                       |
+| 3.3V        | 3.3V    | I2C Sensors         | VCC        | Power     |                       |
+| GND         | GND     | All devices         | GND        | Ground    | Common ground         |
